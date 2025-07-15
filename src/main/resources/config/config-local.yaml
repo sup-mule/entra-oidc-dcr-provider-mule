@@ -1,0 +1,16 @@
+graph:
+  host: graph.microsoft.com
+  port: '443'
+  protocol: HTTPS
+  client_id: <id>
+  client_secret: <secret>
+  tenant: <tenant>
+  scopes: https://graph.microsoft.com/.default
+outlook:
+  client_id: <id>
+  client_secret: <secret>
+  tenant: <tenant>
+  scopes: https://graph.microsoft.com/.default
+  userId: <userid>
+  folder: Inbox
+  filter: subject eq 'New application pending approval'

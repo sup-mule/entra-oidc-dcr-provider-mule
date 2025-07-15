@@ -1,0 +1,283 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="createAppRequest" format="json">
+      <types:shape format="weave" example="examples/applicationpost.json"><![CDATA[%dw 2.0
+
+type createAppRequest = {|
+  displayName: String, 
+  signInAudience: String, 
+  web: {| redirectUris: Array<String> |}, 
+  requiredResourceAccess: Array<{|    resourceAppId: String,     resourceAccess: Array<{|      id: String,       "type": String    |}>
+  |}>
+|} {"example": "{\\\"displayName\\\":\\\"MyDynamicClient\\\",\\\"signInAudience\\\":\\\"AzureADMyOrg\\\",\\\"web\\\":{\\\"redirectUris\\\":[\\\"https:\\/\\/my-app\\/callback\\\"]},\\\"requiredResourceAccess\\\":[{\\\"resourceAppId\\\":\\\"00000003-0000-0000-c000-000000000000\\\",\\\"resourceAccess\\\":[{\\\"id\\\":\\\"e1fe6dd8-ba31-4d61-89e7-88639da4683d\\\",\\\"type\\\":\\\"Scope\\\"}]}]}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="AppResponse" format="json">
+      <types:shape format="weave" example="examples/applicationsOutput.json"><![CDATA[%dw 2.0
+
+type AppResponse = {|
+  "@odata.context": String, 
+  id: String, 
+  deletedDateTime: Null, 
+  appId: String, 
+  applicationTemplateId: Null, 
+  disabledByMicrosoftStatus: Null, 
+  createdDateTime: String, 
+  displayName: String, 
+  description: Null, 
+  groupMembershipClaims: Null, 
+  identifierUris: Array<Any>, 
+  isDeviceOnlyAuthSupported: Null, 
+  isFallbackPublicClient: Null, 
+  nativeAuthenticationApisEnabled: Null, 
+  notes: Null, 
+  publisherDomain: String, 
+  serviceManagementReference: Null, 
+  signInAudience: String, 
+  tags: Array<Any>, 
+  tokenEncryptionKeyId: Null, 
+  uniqueName: Null, 
+  samlMetadataUrl: Null, 
+  defaultRedirectUri: Null, 
+  certification: Null, 
+  optionalClaims: Null, 
+  servicePrincipalLockConfiguration: Null, 
+  requestSignatureVerification: Null, 
+  addIns: Array<Any>, 
+  api: {|
+    acceptMappedClaims: Null, 
+    knownClientApplications: Array<Any>, 
+    requestedAccessTokenVersion: Null, 
+    oauth2PermissionScopes: Array<Any>, 
+    preAuthorizedApplications: Array<Any>
+  |}, 
+  appRoles: Array<Any>, 
+  info: {|
+    logoUrl: Null, 
+    marketingUrl: Null, 
+    privacyStatementUrl: Null, 
+    supportUrl: Null, 
+    termsOfServiceUrl: Null
+  |}, 
+  keyCredentials: Array<Any>, 
+  parentalControlSettings: {|
+    countriesBlockedForMinors: Array<Any>, 
+    legalAgeGroupRule: String
+  |}, 
+  passwordCredentials: Array<Any>, 
+  publicClient: {| redirectUris: Array<Any> |}, 
+  requiredResourceAccess: Array<{|    resourceAppId: String,     resourceAccess: Array<{|      id: String,       "type": String    |}>
+  |}>, 
+  verifiedPublisher: {|
+    displayName: Null, 
+    verifiedPublisherId: Null, 
+    addedDateTime: Null
+  |}, 
+  web: {|
+    homePageUrl: Null, 
+    logoutUrl: Null, 
+    redirectUris: Array<String>, 
+    implicitGrantSettings: {|
+      enableAccessTokenIssuance: Boolean, 
+      enableIdTokenIssuance: Boolean
+    |}, 
+    redirectUriSettings: Array<{|      uri: String,       index: Null    |}>
+  |}, 
+  spa: {| redirectUris: Array<Any> |}
+|} {"example": "{\\\"@odata.context\\\":\\\"https:\\/\\/graph.microsoft.com\\/v1.0\\/\$metadata#applications\\/\$entity\\\",\\\"id\\\":\\\"1324746a-2bf1-47bf-8ac5-1ef93673cfd7\\\",\\\"deletedDateTime\\\":null,\\\"appId\\\":\\\"e03a7cfb-4afa-4c47-9cfc-0c185c9bd1da\\\",\\\"applicationTemplateId\\\":null,\\\"disabledByMicrosoftStatus\\\":null,\\\"createdDateTime\\\":\\\"2025-07-09T19:47:43.2463949Z\\\",\\\"displayName\\\":\\\"testingPostman\\\",\\\"description\\\":null,\\\"groupMembershipClaims\\\":null,\\\"identifierUris\\\":[],\\\"isDeviceOnlyAuthSupported\\\":null,\\\"isFallbackPublicClient\\\":null,\\\"nativeAuthenticationApisEnabled\\\":null,\\\"notes\\\":null,\\\"publisherDomain\\\":\\\"codeOD.onmicrosoft.com\\\",\\\"serviceManagementReference\\\":null,\\\"signInAudience\\\":\\\"AzureADMyOrg\\\",\\\"tags\\\":[],\\\"tokenEncryptionKeyId\\\":null,\\\"uniqueName\\\":null,\\\"samlMetadataUrl\\\":null,\\\"defaultRedirectUri\\\":null,\\\"certification\\\":null,\\\"optionalClaims\\\":null,\\\"servicePrincipalLockConfiguration\\\":null,\\\"requestSignatureVerification\\\":null,\\\"addIns\\\":[],\\\"api\\\":{\\\"acceptMappedClaims\\\":null,\\\"knownClientApplications\\\":[],\\\"requestedAccessTokenVersion\\\":null,\\\"oauth2PermissionScopes\\\":[],\\\"preAuthorizedApplications\\\":[]},\\\"appRoles\\\":[],\\\"info\\\":{\\\"logoUrl\\\":null,\\\"marketingUrl\\\":null,\\\"privacyStatementUrl\\\":null,\\\"supportUrl\\\":null,\\\"termsOfServiceUrl\\\":null},\\\"keyCredentials\\\":[],\\\"parentalControlSettings\\\":{\\\"countriesBlockedForMinors\\\":[],\\\"legalAgeGroupRule\\\":\\\"Allow\\\"},\\\"passwordCredentials\\\":[],\\\"publicClient\\\":{\\\"redirectUris\\\":[]},\\\"requiredResourceAccess\\\":[{\\\"resourceAppId\\\":\\\"00000003-0000-0000-c000-000000000000\\\",\\\"resourceAccess\\\":[{\\\"id\\\":\\\"e1fe6dd8-ba31-4d61-89e7-88639da4683d\\\",\\\"type\\\":\\\"Scope\\\"}]}],\\\"verifiedPublisher\\\":{\\\"displayName\\\":null,\\\"verifiedPublisherId\\\":null,\\\"addedDateTime\\\":null},\\\"web\\\":{\\\"homePageUrl\\\":null,\\\"logoutUrl\\\":null,\\\"redirectUris\\\":[\\\"http:\\/\\/localhost:8081\\/callback\\\"],\\\"implicitGrantSettings\\\":{\\\"enableAccessTokenIssuance\\\":false,\\\"enableIdTokenIssuance\\\":false},\\\"redirectUriSettings\\\":[{\\\"uri\\\":\\\"http:\\/\\/localhost:8081\\/callback\\\",\\\"index\\\":null}]},\\\"spa\\\":{\\\"redirectUris\\\":[]}}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="SecretAdded" format="json">
+      <types:shape format="weave" example="examples/secretAdded.json"><![CDATA[%dw 2.0
+
+type SecretAdded = {|
+  "@odata.context": String, 
+  customKeyIdentifier: Null, 
+  displayName: Null, 
+  endDateTime: String, 
+  hint: String, 
+  keyId: String, 
+  secretText: String, 
+  startDateTime: String
+|} {"example": "{\\\"@odata.context\\\":\\\"https:\\/\\/graph.microsoft.com\\/v1.0\\/\$metadata#microsoft.graph.passwordCredential\\\",\\\"customKeyIdentifier\\\":null,\\\"displayName\\\":null,\\\"endDateTime\\\":\\\"2027-07-14T19:50:17.5046533Z\\\",\\\"hint\\\":\\\"7jW\\\",\\\"keyId\\\":\\\"7f5a12eb-180a-4a1f-baf8-685dd4927501\\\",\\\"secretText\\\":\\\"this is secret\\\",\\\"startDateTime\\\":\\\"2025-07-14T19:50:17.5046533Z\\\"}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="auto_d9dfb25d-8924-4321-962c-ed595d3e8ead_Input-Payload" format="json">
+      <types:shape format="weave" example="weave/autogenerated/d9dfb25d-8924-4321-962c-ed595d3e8ead/Input-Payload.wev" autogeneratedOrigin="3f3e1425-d9e0-4844-929c-d3a0f120ace2"><![CDATA[%dw 2.0
+
+type auto_d9dfb25d_8924_4321_962c_ed595d3e8ead_Input_Payload = {
+  client_uri?: String, 
+  grant_types?: Array<"implicit" | "refresh_token" | "password" | "client_credentials" | "authorization_code">, 
+  logo_uri?: String, 
+  scope?: String, 
+  redirect_uris: Array<String>, 
+  client_name?: String, 
+  token_endpoint_auth_method?: "client_secret_post" | "none" | "client_secret_basic", 
+  contacts?: Array<String>, 
+  response_types?: Array<String>, 
+  _?: Any
+}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="auto_d9dfb25d-8924-4321-962c-ed595d3e8ead_Input-Attributes" format="java">
+      <types:shape format="weave" example="weave/autogenerated/d9dfb25d-8924-4321-962c-ed595d3e8ead/Input-Attributes.wev" autogeneratedOrigin="3f3e1425-d9e0-4844-929c-d3a0f120ace2"><![CDATA[%dw 2.0
+
+type auto_d9dfb25d_8924_4321_962c_ed595d3e8ead_Input_Attributes = {|
+  clientCertificate?: {|
+    publicKey?: {|  |}, 
+    "type"?: String, 
+    encoded?: Binary
+  |}, 
+  headers: {|  |}, 
+  listenerPath: String, 
+  method: String, 
+  queryParams: {|  |}, 
+  queryString: String, 
+  relativePath: String, 
+  remoteAddress: String, 
+  requestPath: String, 
+  requestUri: String, 
+  scheme: String, 
+  uriParams: {|  |}, 
+  version: String, 
+  localAddress: String
+|}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="auto_d9dfb25d-8924-4321-962c-ed595d3e8ead_Input-Variables-outboundHeaders" format="java">
+      <types:shape format="weave" example="weave/autogenerated/d9dfb25d-8924-4321-962c-ed595d3e8ead/Input-Variables-outboundHeaders.wev" autogeneratedOrigin="3f3e1425-d9e0-4844-929c-d3a0f120ace2"><![CDATA[%dw 2.0
+
+type auto_d9dfb25d_8924_4321_962c_ed595d3e8ead_Input_Variables_outboundHeaders = {|  |}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="auto_d9dfb25d-8924-4321-962c-ed595d3e8ead_Input-Variables-httpStatus" format="java">
+      <types:shape format="raml" autogeneratedOrigin="3f3e1425-d9e0-4844-929c-d3a0f120ace2"><![CDATA[#%RAML 1.0 DataType
+type: string]]></types:shape>
+    </types:type>
+    <types:type name="auto_d9dfb25d-8924-4321-962c-ed595d3e8ead_Output-Payload" format="json">
+      <types:shape format="weave" example="weave/autogenerated/d9dfb25d-8924-4321-962c-ed595d3e8ead/Output-Payload.wev" autogeneratedOrigin="3f3e1425-d9e0-4844-929c-d3a0f120ace2"><![CDATA[%dw 2.0
+
+type auto_d9dfb25d_8924_4321_962c_ed595d3e8ead_Output_Payload = {
+  client_uri?: String, 
+  grant_types?: Array<"implicit" | "refresh_token" | "password" | "client_credentials" | "authorization_code">, 
+  logo_uri?: String, 
+  scope?: String, 
+  redirect_uris: Array<String>, 
+  client_name?: String, 
+  token_endpoint_auth_method?: "client_secret_post" | "none" | "client_secret_basic", 
+  contacts?: Array<String>, 
+  response_types?: Array<String>, 
+  _?: Any
+} & {
+  client_secret_expires_at?: Number, 
+  client_secret?: String, 
+  client_id_issued_at?: Number, 
+  client_id?: String, 
+  _?: Any
+}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="auto_d9dfb25d-8924-4321-962c-ed595d3e8ead_Output-Attributes" format="java">
+      <types:shape format="weave" example="weave/autogenerated/d9dfb25d-8924-4321-962c-ed595d3e8ead/Output-Attributes.wev" autogeneratedOrigin="3f3e1425-d9e0-4844-929c-d3a0f120ace2"><![CDATA[%dw 2.0
+
+type auto_d9dfb25d_8924_4321_962c_ed595d3e8ead_Output_Attributes = {|
+  statusCode: Number, 
+  reasonPhrase: String, 
+  headers: { _?: String }
+|} {"typeId": "org.mule.extension.http.api.HttpResponseAttributes",
+"typeAlias": "HttpResponseAttributes"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="auto_d9dfb25d-8924-4321-962c-ed595d3e8ead_Output-Variables-clientId" format="json">
+      <types:shape format="weave" example="weave/autogenerated/d9dfb25d-8924-4321-962c-ed595d3e8ead/Output-Variables-clientId.wev" autogeneratedOrigin="3f3e1425-d9e0-4844-929c-d3a0f120ace2"><![CDATA[%dw 2.0
+
+type auto_d9dfb25d_8924_4321_962c_ed595d3e8ead_Output_Variables_clientId = Null
+
+]]></types:shape>
+    </types:type>
+    <types:type name="auto_d9dfb25d-8924-4321-962c-ed595d3e8ead_Output-Variables-appId" format="json">
+      <types:shape format="weave" example="weave/autogenerated/d9dfb25d-8924-4321-962c-ed595d3e8ead/Output-Variables-appId.wev" autogeneratedOrigin="3f3e1425-d9e0-4844-929c-d3a0f120ace2"><![CDATA[%dw 2.0
+
+type auto_d9dfb25d_8924_4321_962c_ed595d3e8ead_Output_Variables_appId = String
+
+]]></types:shape>
+    </types:type>
+    <types:type name="auto_d9dfb25d-8924-4321-962c-ed595d3e8ead_Output-Variables-sp" format="java">
+      <types:shape format="weave" example="weave/autogenerated/d9dfb25d-8924-4321-962c-ed595d3e8ead/Output-Variables-sp.wev" autogeneratedOrigin="3f3e1425-d9e0-4844-929c-d3a0f120ace2"><![CDATA[%dw 2.0
+
+type auto_d9dfb25d_8924_4321_962c_ed595d3e8ead_Output_Variables_sp = Any
+
+]]></types:shape>
+    </types:type>
+    <types:type name="auto_d9dfb25d-8924-4321-962c-ed595d3e8ead_Output-Variables-outboundHeaders" format="java">
+      <types:shape format="weave" example="weave/autogenerated/d9dfb25d-8924-4321-962c-ed595d3e8ead/Output-Variables-outboundHeaders.wev" autogeneratedOrigin="3f3e1425-d9e0-4844-929c-d3a0f120ace2"><![CDATA[%dw 2.0
+
+type auto_d9dfb25d_8924_4321_962c_ed595d3e8ead_Output_Variables_outboundHeaders = {|  |}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="auto_d9dfb25d-8924-4321-962c-ed595d3e8ead_Output-Variables-httpStatus" format="java">
+      <types:shape format="raml" autogeneratedOrigin="3f3e1425-d9e0-4844-929c-d3a0f120ace2"><![CDATA[#%RAML 1.0 DataType
+type: string]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#e4ed9183-48d0-4da3-abd7-57f07cce3e93">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="createAppRequest"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="AppResponse"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#a0b849f7-cfea-4095-9e50-38ff1ff2aa42">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="SecretAdded"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#d9dfb25d-8924-4321-962c-ed595d3e8ead">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="auto_d9dfb25d-8924-4321-962c-ed595d3e8ead_Input-Payload"/>
+          <types:attributes type="auto_d9dfb25d-8924-4321-962c-ed595d3e8ead_Input-Attributes"/>
+        </types:message>
+        <types:variables>
+          <types:variable name="outboundHeaders" type="auto_d9dfb25d-8924-4321-962c-ed595d3e8ead_Input-Variables-outboundHeaders"/>
+          <types:variable name="httpStatus" type="auto_d9dfb25d-8924-4321-962c-ed595d3e8ead_Input-Variables-httpStatus"/>
+        </types:variables>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="auto_d9dfb25d-8924-4321-962c-ed595d3e8ead_Output-Payload"/>
+          <types:attributes type="auto_d9dfb25d-8924-4321-962c-ed595d3e8ead_Output-Attributes"/>
+        </types:message>
+        <types:variables>
+          <types:variable name="outboundHeaders" type="auto_d9dfb25d-8924-4321-962c-ed595d3e8ead_Output-Variables-outboundHeaders"/>
+          <types:variable name="clientId" type="auto_d9dfb25d-8924-4321-962c-ed595d3e8ead_Output-Variables-clientId"/>
+          <types:variable name="appId" type="auto_d9dfb25d-8924-4321-962c-ed595d3e8ead_Output-Variables-appId"/>
+          <types:variable name="httpStatus" type="auto_d9dfb25d-8924-4321-962c-ed595d3e8ead_Output-Variables-httpStatus"/>
+          <types:variable name="sp" type="auto_d9dfb25d-8924-4321-962c-ed595d3e8ead_Output-Variables-sp"/>
+        </types:variables>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>

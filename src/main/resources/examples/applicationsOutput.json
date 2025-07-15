@@ -1,0 +1,90 @@
+{
+    "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#applications/$entity",
+    "id": "1324746a-2bf1-47bf-8ac5-1ef93673cfd7",
+    "deletedDateTime": null,
+    "appId": "e03a7cfb-4afa-4c47-9cfc-0c185c9bd1da",
+    "applicationTemplateId": null,
+    "disabledByMicrosoftStatus": null,
+    "createdDateTime": "2025-07-09T19:47:43.2463949Z",
+    "displayName": "testingPostman",
+    "description": null,
+    "groupMembershipClaims": null,
+    "identifierUris": [],
+    "isDeviceOnlyAuthSupported": null,
+    "isFallbackPublicClient": null,
+    "nativeAuthenticationApisEnabled": null,
+    "notes": null,
+    "publisherDomain": "codeOD.onmicrosoft.com",
+    "serviceManagementReference": null,
+    "signInAudience": "AzureADMyOrg",
+    "tags": [],
+    "tokenEncryptionKeyId": null,
+    "uniqueName": null,
+    "samlMetadataUrl": null,
+    "defaultRedirectUri": null,
+    "certification": null,
+    "optionalClaims": null,
+    "servicePrincipalLockConfiguration": null,
+    "requestSignatureVerification": null,
+    "addIns": [],
+    "api": {
+        "acceptMappedClaims": null,
+        "knownClientApplications": [],
+        "requestedAccessTokenVersion": null,
+        "oauth2PermissionScopes": [],
+        "preAuthorizedApplications": []
+    },
+    "appRoles": [],
+    "info": {
+        "logoUrl": null,
+        "marketingUrl": null,
+        "privacyStatementUrl": null,
+        "supportUrl": null,
+        "termsOfServiceUrl": null
+    },
+    "keyCredentials": [],
+    "parentalControlSettings": {
+        "countriesBlockedForMinors": [],
+        "legalAgeGroupRule": "Allow"
+    },
+    "passwordCredentials": [],
+    "publicClient": {
+        "redirectUris": []
+    },
+    "requiredResourceAccess": [
+        {
+            "resourceAppId": "00000003-0000-0000-c000-000000000000",
+            "resourceAccess": [
+                {
+                    "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
+                    "type": "Scope"
+                }
+            ]
+        }
+    ],
+    "verifiedPublisher": {
+        "displayName": null,
+        "verifiedPublisherId": null,
+        "addedDateTime": null
+    },
+    "web": {
+        "homePageUrl": null,
+        "logoutUrl": null,
+        "redirectUris": [
+            "http://localhost:8081/callback"
+        ],
+        "implicitGrantSettings": {
+            "enableAccessTokenIssuance": false,
+            "enableIdTokenIssuance": false
+        },
+        "redirectUriSettings": [
+            {
+                "uri": "http://localhost:8081/callback",
+                "index": null
+            }
+        ]
+    },
+    "spa": {
+        "redirectUris": []
+    }
+}

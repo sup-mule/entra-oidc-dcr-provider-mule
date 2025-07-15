@@ -1,0 +1,26 @@
+{
+  "client_uri": "in",
+  "grant_types": [
+    "implicit",
+    "password"
+  ],
+  "logo_uri": "esse",
+  "scope": "sed",
+  "redirect_uris": [
+    "sit",
+    "id"
+  ],
+  "client_name": "in",
+  "token_endpoint_auth_method": "none",
+  "contacts": [
+    "occaecat",
+    "enim"
+  ],
+  "response_types": [
+    "quis",
+    "veniam,"
+  ],
+  "": {
+    
+  }
+}

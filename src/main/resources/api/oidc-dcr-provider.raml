@@ -1,0 +1,194 @@
+#%RAML 1.0
+types:
+  ClientMetadata:
+    type: object
+    properties:
+      client_name?:
+        type: string
+      redirect_uris:
+        type: array
+        example:
+          strict: false
+          value:
+            - https://myapp.com/callback
+        items:
+          type: string
+        required: true
+      token_endpoint_auth_method?:
+        enum:
+          - client_secret_basic
+          - client_secret_post
+          - none
+        type: string
+      grant_types?:
+        type: array
+        items:
+          enum:
+            - authorization_code
+            - implicit
+            - password
+            - client_credentials
+            - refresh_token
+          type: string
+      response_types?:
+        type: array
+        items:
+          type: string
+      scope?:
+        type: string
+      contacts?:
+        type: array
+        items:
+          type: string
+      logo_uri?:
+        type: string
+      client_uri?:
+        type: string
+  ClientRegistrationResponse:
+    (amf-and):
+      - ClientMetadata
+      -
+        type: object
+        properties:
+          client_id?:
+            type: string
+          client_secret?:
+            type: string
+          client_id_issued_at?:
+            type: integer
+          client_secret_expires_at?:
+            type: integer
+    type: any
+annotationTypes:
+  amf-serverDescription:
+    type: any
+  amf-exclusiveMinimum:
+    type: any
+  amf-binding:
+    type: any
+  amf-pattern:
+    type: any
+  amf-payloads:
+    type: any
+  amf-exclusiveMaximum:
+    type: any
+  amf-consumes:
+    type: any
+  amf-additionalProperties:
+    type: any
+  amf-or:
+    type: any
+  amf-url:
+    type: any
+  amf-externalDocs:
+    type: any
+  amf-flow:
+    type: any
+  amf-oasDeprecated:
+    type: any
+  amf-contact:
+    type: any
+  amf-multipleOf:
+    type: any
+  amf-xor:
+    type: any
+  amf-not:
+    type: any
+  amf-callbacks:
+    type: any
+  amf-produces:
+    type: any
+  amf-format:
+    type: any
+  amf-license:
+    type: any
+  amf-summary:
+    type: any
+  amf-responses:
+    type: any
+  amf-maximum:
+    type: any
+  amf-tags:
+    type: any
+  amf-dependencies:
+    type: any
+  amf-readOnly:
+    type: any
+  amf-tuple:
+    type: any
+  amf-examples:
+    type: any
+  amf-collectionFormat:
+    type: any
+  amf-termsOfService:
+    type: any
+  amf-servers:
+    type: any
+  amf-xone:
+    type: any
+  amf-defaultResponse:
+    type: any
+  amf-baseUriParameters:
+    type: any
+  amf-parameters:
+    type: any
+  amf-minimum:
+    type: any
+  amf-recursive:
+    type: any
+  amf-and:
+    type: any
+title: OIDC Dynamic Client Registration API
+description: |
+  OpenID Connect compliant Dynamic Client Registration API for registering, retrieving, updating, and deleting OAuth clients.
+version: 1.0.0
+/register:
+  post:
+    displayName: registerClient
+    (amf-summary): Register a new OAuth client
+    body:
+      application/json: ClientMetadata
+    responses:
+      "201":
+        description: Client registered
+        body:
+          application/json: ClientRegistrationResponse
+/register/{client_id}:
+  get:
+    displayName: getClient
+    (amf-summary): Get client registration
+    (amf-baseUriParameters):
+      client_id:
+        required: true
+        type: string
+    responses:
+      "200":
+        description: Client metadata retrieved
+        body:
+          application/json: ClientRegistrationResponse
+      "404":
+        description: Client not found
+  put:
+    displayName: updateClient
+    (amf-summary): Update client registration
+    body:
+      application/json: ClientMetadata
+    (amf-baseUriParameters):
+      client_id:
+        required: true
+        type: string
+    responses:
+      "200":
+        description: Client updated
+        body:
+          application/json: ClientRegistrationResponse
+  delete:
+    displayName: deleteClient
+    (amf-summary): Delete client registration
+    (amf-baseUriParameters):
+      client_id:
+        required: true
+        type: string
+    responses:
+      "204":
+        description: Client deleted

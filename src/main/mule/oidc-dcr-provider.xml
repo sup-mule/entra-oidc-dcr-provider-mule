@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:outlook365="http://www.mulesoft.org/schema/mule/outlook365" xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns:oauth="http://www.mulesoft.org/schema/mule/oauth" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd 
+http://www.mulesoft.org/schema/mule/oauth http://www.mulesoft.org/schema/mule/oauth/current/mule-oauth.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
+http://www.mulesoft.org/schema/mule/outlook365 http://www.mulesoft.org/schema/mule/outlook365/current/mule-outlook365.xsd">
+    <http:listener-config name="oidc-dcr-provider-httpListenerConfig">
+        <http:listener-connection host="0.0.0.0" port="8081" />
+    </http:listener-config>
+    <apikit:config name="oidc-dcr-provider-config" api="api/oidc-dcr-provider.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <http:request-config name="GraphAPIConfig" doc:name="HTTP Request configuration" doc:id="a40788ef-8465-4550-a6c4-6f0c08dcdb50" >
+		<http:request-connection protocol="${graph.protocol}" host="${graph.host}" port="${graph.port}" >
+			<http:authentication >
+				<oauth:client-credentials-grant-type clientId="${graph.client_id}" clientSecret="${graph.client_secret}" scopes="${graph.scopes}" tokenUrl="https://login.microsoftonline.com/${graph.tenant}/oauth2/v2.0/token" >
+					<oauth:token-manager objectStore="TokenObjectStore" />
+				</oauth:client-credentials-grant-type>
+			</http:authentication>
+		</http:request-connection>
+	</http:request-config>
+	<os:object-store name="TokenObjectStore" doc:name="Object store" doc:id="9634a2d1-8c3a-4413-969d-62a98a50b8ce" />
+	<outlook365:outlook365-config name="Outlook365_Outlook365_Config" doc:name="Outlook365 Outlook365 Config" doc:id="785f9562-58ac-4ec2-a075-671d1e735b29" >
+		<outlook365:oauth-client-credentials-connection >
+			<outlook365:oauth-client-credentials clientId="${outlook.client_id}" clientSecret="${outlook.client_secret}" tokenUrl="https://login.microsoftonline.com/${outlook.tenant}/oauth2/v2.0/token" scopes="${outlook.scopes}" />
+			<outlook365:oauth-store-config objectStore="client-creds-token" />
+		</outlook365:oauth-client-credentials-connection>
+	</outlook365:outlook365-config>
+	<os:object-store name="client-creds-token" doc:name="Object store" doc:id="72880f0f-1ca0-4540-9fde-22bdc4ba5126" />
+	<configuration-properties doc:name="Configuration properties" doc:id="7b97b9a0-8590-4c70-8839-f6a95fa32290" file="config/config-${env}.yaml" />
+	<global-property doc:name="Global Property" doc:id="e2036e8d-184d-40a5-a9ba-54560bcba297" name="env" value="local" />
+	<sub-flow name="registerclient" doc:id="d9dfb25d-8924-4321-962c-ed595d3e8ead" >
+		<ee:transform doc:name="Transform Message" doc:id="b9256b60-4e6d-4deb-8c50-08ebd2ec316e">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	displayName: payload.client_name default "",
+	signInAudience: "AzureADMyOrg",
+	web: {
+		redirectUris: payload.redirect_uris map ( redirecturi , indexOfRedirecturi ) -> redirecturi
+	},
+	"requiredResourceAccess": [
+    {
+      "resourceAppId": "00000003-0000-0000-c000-000000000000", // Microsoft Graph
+      "resourceAccess": [
+        {
+          "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d", // User.Read
+          "type": "Scope"
+        }
+      ]
+    }
+  ]
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<http:request method="POST" doc:name="Create Application on Entra" doc:id="e4ed9183-48d0-4da3-abd7-57f07cce3e93" config-ref="GraphAPIConfig" path="/v1.0/applications" />
+		<set-variable value="#[payload.appId]" doc:name="clientId" doc:id="eb354f89-3ab6-4ca9-b626-5a0a5d1777ae" variableName="clientId" />
+		<set-variable value="#[payload.id]" doc:name="appId" doc:id="94f95b0d-389a-4d7a-95e3-bb2d20bf4955" variableName="appId"/>
+		<http:request method="POST" doc:name="Create Service Principle" doc:id="75755d34-5a72-4f55-8f8f-752b317c0772" config-ref="GraphAPIConfig" path="/v1.0/servicePrincipals" >
+			<http:body ><![CDATA[#[%dw 2.0
+output application/json
+---
+{"appId": vars.clientId}]]]></http:body>
+		</http:request>
+		<set-variable value="#[payload]" doc:name="sp" doc:id="e5636a8c-4e23-4a65-829e-4cd4d8ce0241" variableName="sp"/>
+		<http:request method="POST" doc:name="Add A Secret" doc:id="a0b849f7-cfea-4095-9e50-38ff1ff2aa42" path='#["/v1.0/applications/$(vars.appId default "")/addPassword"]' config-ref="GraphAPIConfig" >
+			<http:body ><![CDATA[#[%dw 2.0
+output application/json
+---
+{
+	appId: vars.appId
+}]]]></http:body>
+		</http:request>
+		<ee:transform doc:name="Transform Message" doc:id="28e67716-e6b6-4e10-b483-035decb95dd8">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  "client_uri": "",
+  "grant_types": "",
+  "logo_uri": "",
+  "scope": "",
+  "redirect_uris": "",
+  "client_name": vars.sp.displayName default "",
+  "token_endpoint_auth_method": "",
+  "contacts": "",
+  "response_types": "",
+  "client_secret_expires_at": payload.endDateTime,
+  "client_secret": payload.secretText,
+  "client_id_issued_at": payload.startDateTime,
+  "client_id": vars.clientId
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" message="post:\register:application\json:oidc-dcr-provider-config" />
+	</sub-flow>
+	<flow name="ApprovalRequestFlowUsingEmail" doc:id="0f29428d-8dc7-48c7-bee0-9e29ac6144ef" >
+		<outlook365:new-email-listener doc:name="On New Email" doc:id="508923c7-5f9a-4174-9ada-6e473f12775e" config-ref="Outlook365_Outlook365_Config" userId="${outlook.userId}" mailFolderId="${outlook.folder}" filter="${outlook.filter}">
+			<scheduling-strategy >
+				<fixed-frequency frequency="10" timeUnit="SECONDS" startDelay="10"/>
+			</scheduling-strategy>
+		</outlook365:new-email-listener>
+		<ee:transform doc:name="Transform Message" doc:id="3c4344e5-b459-4e14-ae3c-bcb95659dfd7" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+
+// Function to extract content from HTML
+fun extractFromHtml(html) = do {
+    // First, remove HTML tags and clean up whitespace
+    var cleanText = (html as String) replace /<[^>]*>/ with " " replace /\s+/ with " " replace /&nbsp;/ with " "
+    
+    // Extract specific information
+    var applicationName = (cleanText scan /The application, (.*?), has requested/)[0][1] default null
+    var fullApiName = (cleanText scan /API Name: (.*?)(?=API Version:|$)/)[0][1] default null
+    var apiVersion = (cleanText scan /API Version: (.*?)(?=Requested SLA Tier:|$)/)[0][1] default null
+    var slaTier = (cleanText scan /Requested SLA Tier: (.*?)(?=App Owners:|$)/)[0][1] default null
+    var appOwners = (cleanText scan /App Owners: (.*?)(?=To review|$)/)[0][1] default null
+    var reviewLink = (cleanText scan /visit the (https:\/\/anypoint\.mulesoft\.com\/.*?)(?= |$)/)[0][1] default null
+    
+    // Split groupId and assetId from API name
+    var parts = fullApiName splitBy ":"
+    var groupId = if (parts[0] == "groupId") parts[1] else null
+    var assetId = if (parts[2] == "assetId") parts[3] else null
+    ---
+    // Return structured data
+    {
+        applicationName: applicationName,
+        apiDetails: {
+            fullName: fullApiName,
+            groupId: groupId,
+            assetId: assetId,
+            version: apiVersion,
+            slaTier: slaTier
+        },
+        appOwners: appOwners,
+        reviewLink: reviewLink,
+        emailSubject: payload.subject,
+        sender: payload.from.emailAddress.address,
+        recipient: payload.toRecipients[0].emailAddress.address,
+        sentDateTime: payload.sentDateTime
+    }
+}
+
+// Apply the extraction function to the email body content
+---
+extractFromHtml(payload.body.content)]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="9e0b3d62-590e-462c-938d-6ff5fea85e33" message="#[payload]"/>
+	</flow>
+	<flow name="oidc-dcr-provider-main">
+        <http:listener config-ref="oidc-dcr-provider-httpListenerConfig" path="/clients/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body><![CDATA[#[payload]]]></http:body>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="oidc-dcr-provider-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:BAD_REQUEST">
+                <ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Bad request"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">400</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:METHOD_NOT_ALLOWED">
+                <ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Method not allowed"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">405</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_ACCEPTABLE">
+                <ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not acceptable"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">406</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
+                <ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Unsupported media type"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">415</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_IMPLEMENTED">
+                <ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not Implemented"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">501</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="oidc-dcr-provider-console">
+        <http:listener config-ref="oidc-dcr-provider-httpListenerConfig" path="/console/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="oidc-dcr-provider-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="put:\register\(client_id):application\json:oidc-dcr-provider-config">
+        <ee:transform doc:name="Transform Message">
+            <ee:variables>
+                <ee:set-variable variableName="client_id">attributes.uriParams.'client_id'</ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <logger level="INFO" message="put:\register\(client_id):application\json:oidc-dcr-provider-config" />
+    </flow>
+	<flow name="delete:\register\(client_id):oidc-dcr-provider-config">
+        <ee:transform doc:name="Transform Message">
+            <ee:variables>
+                <ee:set-variable variableName="client_id">attributes.uriParams.'client_id'</ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <logger level="INFO" message="delete:\register\(client_id):oidc-dcr-provider-config" />
+    </flow>
+    <flow name="get:\register\(client_id):oidc-dcr-provider-config">
+        <ee:transform doc:name="Transform Message">
+            <ee:variables>
+                <ee:set-variable variableName="client_id">attributes.uriParams.'client_id'</ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <logger level="INFO" message="get:\register\(client_id):oidc-dcr-provider-config" />
+    </flow>
+    <flow name="post:\register:application\json:oidc-dcr-provider-config">
+        <logger level="INFO" doc:name="Trace" doc:id="4223a961-5673-4229-94f0-1e36cd6da714" message='#["Starting Execution of Client Registration \n"]'/>
+		<logger level="INFO" doc:name="Logger" doc:id="7043346b-0a59-49ac-befd-6c713aa05602" message="#[payload]"/>
+		<flow-ref doc:name="registerClient" doc:id="3f3e1425-d9e0-4844-929c-d3a0f120ace2" name="registerclient"/>
+    </flow>
+</mule>
